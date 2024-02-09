@@ -1,13 +1,23 @@
-$List_Network_Properties = @(
-"DNSHostName",
-"MACAddress",
-"Description",
-"DHCPEnabled",
-"InterfaceIndex",
-"IPAddress",
-"IPSubnet",
-"DefaultIPGateway",
-"DNSServerSearchOrder")
+function GetNetworkProp {
+    <#
+    .SYNOPSIS
+    Specifies the required properties of network adapters
+        
+    .OUTPUTS
+    Returns list of properties.
+    #>
+
+    return @(
+        "DNSHostName",
+        "MACAddress",
+        "Description",
+        "DHCPEnabled",
+        "InterfaceIndex",
+        "IPAddress",
+        "IPSubnet",
+        "DefaultIPGateway",
+        "DNSServerSearchOrder")
+}
 
 function GetAdapterList {
     <#    
@@ -18,7 +28,8 @@ function GetAdapterList {
     Returns list of adapters.
     #>
 
-    return Get-WmiObject -Class Win32_NetworkAdapterConfiguration -Filter IPEnabled=TRUE | Select-Object -Property $List_Network_Properties
+    $Net_Prop = GetNetworkProp
+    return Get-WmiObject -Class Win32_NetworkAdapterConfiguration -Filter IPEnabled=TRUE | Select-Object -Property $Net_Prop
 }
 
 function GetAdapterByMAC{
@@ -27,7 +38,7 @@ function GetAdapterByMAC{
     Getting network adapter by specific MAC 
         
     .PARAMETER MAC_Addr
-    MAC address needed adapter
+    MAC address specified adapter
     
     .OUTPUTS
     Returns object type of [PSCustomObject] with propeties which declared in variable $Arr_Prop
@@ -37,7 +48,8 @@ function GetAdapterByMAC{
         [string]$MAC_Addr
     )
 
-    return Get-WmiObject -Class Win32_NetworkAdapterConfiguration -Filter "MACAddress='$MAC_Addr'" | Select-Object -Property $List_Network_Properties
+    $Net_Prop = GetNetworkProp
+    return Get-WmiObject -Class Win32_NetworkAdapterConfiguration -Filter "MACAddress='$MAC_Addr'" | Select-Object -Property $Net_Prop
 }
 
 function GetConnectStatusAdapter {
@@ -83,7 +95,7 @@ function GetConnectStatusAdapter {
             6 { $String_Status_Connect = $Mesg + "hardware malfunction (Code 6)" }
             7 { $String_Status_Connect = $Mesg + "media disconnected (Code 7)" }
             8 { $String_Status_Connect = $Mesg + "authenticating (Code 8)" }
-            9 { $String_Status_Connect = $Mesg + "authentication Succeeded (Code 9)" }
+            9 { $String_Status_Connect = $Mesg + "authentication succeeded (Code 9)" }
             10 { $String_Status_Connect = $Mesg + "authentication failed (Code 10)" }
             11 { $String_Status_Connect = $Mesg + "invalid address (Code 11)" }
             12 { $String_Status_Connect = $Mesg + "credentials required (Code 12)" }

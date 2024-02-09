@@ -27,7 +27,8 @@ function WriteLog {
         [string]$Message
     )
 
-    $Time_stamp = (Get-Date).toString("[yyyy/MM/dd HH:mm:ss] ")
+    $Time_stamp = (Get-Date).toString("[yyyy/MM/dd HH:mm:ss] - ")
+    
     $Res = $Time_stamp + $Level + ": " + $Message
     
     Add-Content $Path_logs -Value $Res

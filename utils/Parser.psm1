@@ -6,19 +6,20 @@ function ParseFile {
     .DESCRIPTION
     Parsing file which contains values of IP address,MAC,subnet mask,gateway network,primary/secondary dns and hostname 
     #>
-
-    param (
-        #Data file
-        [string]$File
-    )
-        
-    $Content_File = import-csv $File -delimiter "`t" 
+    
+    try {
+        $Content_File = Import-Csv -Path ((Get-Item -Path $PSScriptRoot).Parent.FullName + '\' + "net_preset.dat") -delimiter "`t" 
+    }
+    catch {
+        WriteLog "ERROR" (GetErrorRecordForLog $PSItem.Exception.Message $PSItem.CategoryInfo $PSItem.InvocationInfo)
+        throw $PSItem
+    }
 
     #Getting all network adapters which supports TCP/IP on current local machine. 
     $List_Net_Adap = GetAdapterList 
     
     [System.Collections.ArrayList]$List_Obj_Network = @()
-     
+
     :outer 
     foreach($i in $List_Net_Adap){
        foreach($j in $Content_File){
@@ -29,7 +30,13 @@ function ParseFile {
            }
        }
     }
-    return $List_Obj_Network.ToArray()
+
+    if($List_Obj_Network.Count -eq 0){
+        WriteLog "ERROR" "No matching MAC addresses were found"
+        throw [System.NullReferenceException] "No matching MAC addresses were found"
+    } else {
+        return $List_Obj_Network.ToArray()
+    }
 }
 
 Export-ModuleMember -Function ParseFile
